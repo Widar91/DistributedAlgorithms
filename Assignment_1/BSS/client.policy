@@ -1,0 +1,3 @@
+grant codeBase "file:/Users/Eddy/Dropbox/University/TU Delft - MSc Computer Science/Q3/Distributed Algorithms/Ex1/BSS/target/classes/" {
+    permission java.security.AllPermission;
+};
