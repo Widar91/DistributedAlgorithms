@@ -1,7 +1,5 @@
 package nl.tudelft.in4150;
 
-import java.util.Properties;
-
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -36,6 +34,8 @@ public class App {
 		
 		
 		node.sendMessage("Porco di dio");
+		node.sendMessage("Tortellini");
+		node.sendMessage("The Anszver is Guwac");
 
 
     }
