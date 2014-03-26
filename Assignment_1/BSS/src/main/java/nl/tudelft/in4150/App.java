@@ -21,11 +21,11 @@ public class App {
         	System.setSecurityManager(new RMISecurityManager()); 
         
         //Registry creation
-        try {
-        	java.rmi.registry.LocateRegistry.getRegistry(Integer.parseInt(args[1])); 
-        } catch (RemoteException e) {
-        	java.rmi.registry.LocateRegistry.createRegistry(Integer.parseInt(args[1]));
-        }
+//        try {
+//        	java.rmi.registry.LocateRegistry.getRegistry(Integer.parseInt(args[1])); 
+//        } catch (RemoteException e) {
+//        	java.rmi.registry.LocateRegistry.createRegistry(Integer.parseInt(args[1]));
+//        }
         
     	int nodeId = Integer.parseInt(args[0]);
 
