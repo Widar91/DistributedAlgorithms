@@ -35,7 +35,7 @@ public class App {
 		System.out.println("Node["+ nodeId +"] Initialized..");
 		
 		Context namingContext = new InitialContext(); 
-		namingContext.bind("rmi:" + nodeId, node);
+		namingContext.bind("rmi:" + args[1], node);
 		
 		List<String> ms = new ArrayList<String>();
 		ms.add(nodeId + " -> 1");
