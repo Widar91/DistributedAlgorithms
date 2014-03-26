@@ -31,7 +31,7 @@ public class Utils {
 		Properties properties = new Properties();
 
 		try {
-			properties.load(new FileInputStream(System.getProperty("user.dir") + "/config" + (nodeId + 1) + ".properties"));
+			properties.load(new FileInputStream(System.getProperty("user.dir") + "/config" + nodeId + ".properties"));
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 		}

@@ -27,7 +27,7 @@ public class App {
         	java.rmi.registry.LocateRegistry.createRegistry(Integer.parseInt(args[1]));
         }
         
-    	int nodeId = Integer.parseInt(args[0]) - 1;
+    	int nodeId = Integer.parseInt(args[0]);
 
     	BSSNode node;
 		node = new BSSNode(nodeId);
@@ -35,12 +35,12 @@ public class App {
 		System.out.println("Node["+ nodeId +"] Initialized..");
 		
 		Context namingContext = new InitialContext(); 
-		namingContext.bind("rmi:" + args[1], node);
+		namingContext.bind(args[1], node);
 		
 		List<String> ms = new ArrayList<String>();
-		ms.add(nodeId + " -> 1");
-		ms.add(nodeId + " -> 2");
-		ms.add(nodeId + " -> 3");
+		ms.add(nodeId + " -> Message 1");
+		ms.add(nodeId + " -> Message 2");
+		ms.add(nodeId + " -> Message 3");
 		node.sendMessage(ms);
 
 

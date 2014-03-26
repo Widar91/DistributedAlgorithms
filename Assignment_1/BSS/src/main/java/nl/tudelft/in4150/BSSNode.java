@@ -113,16 +113,16 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 		
 		networkNodes.parallelStream()
 					.forEach( receiverURL -> {
-						int receiverId = receiverURL.charAt(receiverURL.length() - 1); 
+						int receiverId = Integer.parseInt("" + receiverURL.charAt(receiverURL.length() - 1)); 
 						if(receiverId != nodeId) {
 							try {
 								
-								Thread.sleep(Utils.getDelay(nodeId, receiverId));
+								//Thread.sleep(Utils.getDelay(nodeId, receiverId));
 								
 								System.out.println(nodeId + ">> Sending Message to " + receiverURL /*+ ": " + msg.toString()*/);
 								
 								Context namingContext = new InitialContext(); 
-								BSS_RMI RMIreceiver = (BSS_RMI) namingContext.lookup("rmi:" + receiverURL);
+								BSS_RMI RMIreceiver = (BSS_RMI) namingContext.lookup(receiverURL);
 								RMIreceiver.processMessage(msg);
 								
 								//System.out.println(nodeId + ">> Message Sent.");
