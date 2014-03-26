@@ -27,7 +27,7 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 
 
 	@Override 
-	public void processMessage(Message msg) throws RemoteException {
+	public synchronized void processMessage(Message msg) throws RemoteException {
 		
 		System.out.println(nodeId + ">> Receiving Message...");
 		
@@ -36,30 +36,26 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 			//Deliver the message
 			System.out.println("Received Message: " + msg);
 			
-			synchronized(this) {
-				
-				//Increase message count of the sender
-				updateVectorClock(msg.getSenderId());
-				
-				
-				//Check for pending messages in the buffer
-				for(int i = 0; i < buffer.size(); i++ ) {
-					
-					Message m = buffer.get(i);
-					
-					if(canBeDelivered(m)) { 
-						
-						System.out.println("Delivering [Buffered] Message: " + m);
-						
-						updateVectorClock(m.getSenderId());
-						buffer.remove(m);
-						i = 0;
-						
-					}
-				}
-				
-			}
+			//Increase message count of the sender
+			updateVectorClock(msg.getSenderId());
 			
+			
+			//Check for pending messages in the buffer
+			for(int i = 0; i < buffer.size(); i++ ) {
+				
+				Message m = buffer.get(i);
+				
+				if(canBeDelivered(m)) { 
+					
+					System.out.println("Delivering [Buffered] Message: " + m);
+					
+					updateVectorClock(m.getSenderId());
+					buffer.remove(i);
+					i = -1;
+					
+				}
+			}
+				
 		}
 		else {
 			System.out.println(nodeId + ">> [Buffered] Message cannot be displayed");
@@ -67,11 +63,10 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 		}
 		
 		System.out.println("buffer" + buffer);
-		System.out.println("\n");
 	}
 
 
-	public void sendMessage(String msgBody) {
+	public synchronized void sendMessage(List<String> msgBodies) {
 		
 		//Spawn a new Thread for sending messages
 		new Thread ( () -> {
@@ -80,23 +75,28 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 				Thread.sleep(10000);
 			} catch (Exception e) {
 				e.printStackTrace();
-			}
+ 	 		}
 			
-			Message msg = null;
+			msgBodies.stream()
+					 .forEach(msgBody -> {
 			
-			//no modifications must be conducted between the update of the Vector Clock and the creation of the message
-			synchronized(localVectorClock) {
-				
-				//Increase message count for this node
-				updateVectorClock(nodeId);
-				
-				//Create the message
-				msg = new Message(nodeId, msgBody, localVectorClock.clone());
+						Message msg = null;
+						
+						//no modifications must be conducted between the update of the Vector Clock and the creation of the message
+						synchronized(localVectorClock) {
+							
+							//Increase message count for this node
+							updateVectorClock(nodeId);
+							
+							//Create the message
+							msg = new Message(nodeId, msgBody, localVectorClock.clone());
+						
+						}
+						
+						//Broadcast the message
+						broadcastMessage(msg);
 			
-			}
-			
-			//Broadcast the message
-			broadcastMessage(msg);
+					 });
 			
 		}).start();
 	}
@@ -118,13 +118,13 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 								
 								Thread.sleep(Utils.getDelay(nodeId, receiverId));
 								
-								System.out.println(nodeId + ">> Sending Message to " + receiverId + ": " + msg.toString());
+								System.out.println(nodeId + ">> Sending Message to " + receiverId /*+ ": " + msg.toString()*/);
 								
 								Context namingContext = new InitialContext(); 
 								BSS_RMI RMIreceiver = (BSS_RMI) namingContext.lookup("rmi:" + receiverId);
 								RMIreceiver.processMessage(msg);
 								
-								System.out.println(nodeId + ">> Message Sent.\n\n");
+								//System.out.println(nodeId + ">> Message Sent.");
 								
 							} catch (Exception e) { 
 								e.printStackTrace(); 
