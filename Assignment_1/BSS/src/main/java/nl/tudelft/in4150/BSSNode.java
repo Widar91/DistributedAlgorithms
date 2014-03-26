@@ -15,7 +15,7 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 	private int nodeId;
 	private int[] localVectorClock;	
 	private List<Message> buffer;
-	private List<Integer> networkNodes;
+	private List<String> networkNodes;
 	
 	protected BSSNode(int id) throws RemoteException {
 		super();
@@ -112,16 +112,17 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 	private void broadcastMessage(Message msg) {
 		
 		networkNodes.parallelStream()
-					.forEach( receiverId -> {
+					.forEach( receiverURL -> {
+						int receiverId = receiverURL.charAt(receiverURL.length() - 1); 
 						if(receiverId != nodeId) {
 							try {
 								
 								Thread.sleep(Utils.getDelay(nodeId, receiverId));
 								
-								System.out.println(nodeId + ">> Sending Message to " + receiverId /*+ ": " + msg.toString()*/);
+								System.out.println(nodeId + ">> Sending Message to " + receiverURL /*+ ": " + msg.toString()*/);
 								
 								Context namingContext = new InitialContext(); 
-								BSS_RMI RMIreceiver = (BSS_RMI) namingContext.lookup("rmi:" + receiverId);
+								BSS_RMI RMIreceiver = (BSS_RMI) namingContext.lookup("rmi:" + receiverURL);
 								RMIreceiver.processMessage(msg);
 								
 								//System.out.println(nodeId + ">> Message Sent.");

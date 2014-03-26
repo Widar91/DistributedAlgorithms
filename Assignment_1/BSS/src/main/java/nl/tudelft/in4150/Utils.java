@@ -13,15 +13,15 @@ public class Utils {
 		return Long.parseLong((String) Configuration.get("d"+receiverId));
 	}
 	
-	public static List<Integer> getConfiguration(int nodeId, String conf) {
+	public static List<String> getConfiguration(int nodeId, String conf) {
 		
 		Properties Configuration = Utils.loadProperties(nodeId);
 		
 		String[] config = ((String)Configuration.get(conf)).split(" ");
-		List<Integer> result = new ArrayList<Integer>();
+		List<String> result = new ArrayList<String>();
 		
 		for (int i = 0; i < config.length; i++)
-			result.add(Integer.parseInt(config[i]));
+			result.add(config[i]);
 
 		return result;
 	}
