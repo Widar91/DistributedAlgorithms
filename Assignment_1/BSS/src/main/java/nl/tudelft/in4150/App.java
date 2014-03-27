@@ -1,7 +1,6 @@
 package nl.tudelft.in4150;
 
-import java.rmi.RMISecurityManager;
-import java.rmi.RemoteException;
+import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,7 +17,14 @@ public class App {
     	
         //Security Manager setup
         if (System.getSecurityManager() == null)
-        	System.setSecurityManager(new RMISecurityManager()); 
+        	System.setSecurityManager(new SecurityManager() {
+        	    public void checkConnect (String host, int port) {}
+        	    public void checkConnect (String host, int port, Object context) {}
+        	    public void checkPermission (Permission perm) {}
+        	    public void checkPermission (Permission perm, Object context) {}
+        	    public void checkPropertyAccess () {}
+        	    public void checkPropertyAccess (String key) {}
+        	 }); 
         
         //Registry creation
 //        try {
@@ -29,21 +35,31 @@ public class App {
         
     	int nodeId = Integer.parseInt(args[0]);
 
-    	BSSNode node;
-		node = new BSSNode(nodeId);
-		
-		System.out.println("Node["+ nodeId +"] Initialized..");
-		
+    	List<BSSNode> nodes = new ArrayList<BSSNode>();
+		nodes.add(new BSSNode(0));
+		nodes.add(new BSSNode(1));
+		nodes.add(new BSSNode(2));
+
 		Context namingContext = new InitialContext(); 
-		namingContext.bind(args[1], node);
 		
-		List<String> ms = new ArrayList<String>();
-		ms.add(nodeId + " -> Message 1");
-		ms.add(nodeId + " -> Message 2");
-		ms.add(nodeId + " -> Message 3");
-		node.sendMessage(ms);
-
-
+		nodes.parallelStream()
+			 .forEach( n -> {
+				 
+				 try {
+					namingContext.bind("rmi:" + n.getNodeId(), n);
+				 } catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				 }
+				
+				 List<String> ms = new ArrayList<String>();
+				 ms.add(n.getNodeId() + " -> Message 1");
+				 ms.add(n.getNodeId() + " -> Message 2");
+				 ms.add(n.getNodeId() + " -> Message 3");
+				 n.sendMessage(ms);
+					 
+			 });
+		
     }
     
 }

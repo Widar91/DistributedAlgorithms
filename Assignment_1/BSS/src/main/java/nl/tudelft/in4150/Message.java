@@ -52,11 +52,13 @@ public class Message implements Serializable{
 		String vc = "";
 		for (int v : vectorClock) { vc += v + " "; } 
 		
-		return 	  "\n\t ***********************"
-				+ "\n\t Message: [" + body + "]" 
-				+ "\n\t Sender: Node[" + senderId + "]"
-				+ "\n\t Timestamp: <" + vc.trim() + ">"
-				+ "\n\t ***********************";
+//		return 	  "\n\t ***********************"
+//				+ "\n\t Message: [" + body + "]" 
+//				+ "\n\t Sender: Node[" + senderId + "]"
+//				+ "\n\t Timestamp: <" + vc.trim() + ">"
+//				+ "\n\t ***********************";
+		
+		return body;
 		
 	}
 

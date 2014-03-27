@@ -12,7 +12,7 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 	
 	private static final long serialVersionUID = -8797608050445201096L;
 
-	private int nodeId;
+	public int nodeId;
 	private int[] localVectorClock;	
 	private List<Message> buffer;
 	private List<String> networkNodes;
@@ -23,18 +23,27 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 		this.networkNodes = Utils.getConfiguration(nodeId, "nodes");
 		this.localVectorClock = new int[networkNodes.size()];
 		this.buffer = new ArrayList<Message>();
+		
+		System.out.println("Node["+ nodeId +"] Initialized..");
 	}
+
+
+	public int getNodeId() {
+		return nodeId;
+	}
+	
+	
 
 
 	@Override 
 	public synchronized void processMessage(Message msg) throws RemoteException {
 		
-		System.out.println(nodeId + ">> Receiving Message...");
+		//System.out.println(nodeId + ">> Receiving Message...");
 		
 		if(canBeDelivered(msg)) {
 			
 			//Deliver the message
-			System.out.println("Received Message: " + msg);
+			System.out.println(nodeId + ">> Received Message: " + msg);
 			
 			//Increase message count of the sender
 			updateVectorClock(msg.getSenderId());
@@ -117,7 +126,7 @@ public class BSSNode extends UnicastRemoteObject implements BSS_RMI {
 						if(receiverId != nodeId) {
 							try {
 								
-								//Thread.sleep(Utils.getDelay(nodeId, receiverId));
+								Thread.sleep(Utils.getDelay(nodeId, receiverId));
 								
 								System.out.println(nodeId + ">> Sending Message to " + receiverURL /*+ ": " + msg.toString()*/);
 								
