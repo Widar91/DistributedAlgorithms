@@ -29,8 +29,12 @@ public class Candidate implements Serializable {
 			} else {
 				for (int i = 0; i < K; i++) {
 					Integer n = E.get(0);
-					Node RMIreceiver = (Node) java.rmi.Naming.lookup(Config.nodes[n]);
-					RMIreceiver.sendMessage(new Message(level, id));
+					System.out.println("\n" + id + " >> [Candidate] sending msg to " + Config.nodes[n]);
+					
+					//Node RMIreceiver = (Node) java.rmi.Naming.lookup(Config.nodes[n]);
+					//RMIreceiver.sendMessage(new Message(level, id));
+					Maestro.nodes.get(n).sendMessage(new Message(level, id));
+					
 					E.remove(0);
 				}
 			}

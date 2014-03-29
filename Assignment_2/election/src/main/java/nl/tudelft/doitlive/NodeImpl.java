@@ -23,30 +23,33 @@ public class NodeImpl implements Node {
 
 		List<Integer> E = new ArrayList<>();
 		for (int n = 0; n < Config.numNodes; n++)
-			E.add(n);
+			if(n != id)
+				E.add(n);
+
 		candidate = new Candidate(id, E);
-		
 		ordinary = new Ordinary(id);
+		
 	}
 
 	@Override
-	public void sendMessage(Message m) throws RemoteException {
+	public synchronized void sendMessage(Message m) throws RemoteException {
 		messages.add(m);
-		System.out.println(id + " >> [NodeImpl] sendMessage: " + m);
-		System.out.println(id + " >> [NodeImpl] msg list: " + messages);
+		System.out.println(id + " >> [NodeImpl]  sendMessage: " + m);
+		System.out.println(id + " >> [NodeImpl]  msg list:   " + messages + "["+ messages.hashCode() +"]");
 	}
 
 	@Override
-	public void sendAck(int fromNode) throws RemoteException {
+	public synchronized void sendAck(int fromNode) throws RemoteException {
 		acks.add(fromNode);
 	}
 
 	@Override
-	public boolean pulseOrdinary() throws RemoteException {
+	public synchronized boolean pulseOrdinary() throws RemoteException {
 		try {
-			acks.clear();
-			System.out.println("[pulse] messages: " + messages);
+			System.out.println(id + " >> [pulseOrd]  messages: " + messages);
 			ordinary.run(messages);
+			System.out.println(id + " >> [pulseOrd] finished - clearing msg list " + messages);
+			messages.clear();
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}
@@ -54,12 +57,12 @@ public class NodeImpl implements Node {
 	}
 
 	@Override
-	public boolean pulseCandidate() throws RemoteException {
+	public synchronized boolean pulseCandidate() throws RemoteException {
 		try {
-			messages.clear();
 			if (candidate.canLee() && candidate.run(acks))
 				return true;
-			System.out.println("[acks] acks: " + acks);
+			System.out.println(id + " >> [pulseCand] finished - clearing ack list: " + acks);
+			acks.clear();
 		} catch (Throwable t) {
 			t.printStackTrace();
 		}

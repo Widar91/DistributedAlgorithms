@@ -23,6 +23,6 @@ class Message implements Comparable<Message>, Serializable {
 	
 	@Override
 	public String toString() {
-		return "[Message] " + level + " " + id;
+		return "< lvl " + level + ", from " + id + ">";
 	}
 }
