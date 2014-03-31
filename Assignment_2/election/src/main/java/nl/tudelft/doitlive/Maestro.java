@@ -47,12 +47,10 @@ public class Maestro {
 		
     	java.rmi.registry.LocateRegistry.getRegistry(1099);
 		List<Node> nodes = new ArrayList<Node>();
-		for (String node : Config.localNodes) {
+		for (String node : Config.nodes) {
 			nodes.add((Node) java.rmi.Naming.lookup(node));
 		}
-		for (String node : Config.remoteNodes) {
-			nodes.add((Node) java.rmi.Naming.lookup(node));
-		}
+		
 
     	// turns
 		while (true) {

@@ -23,11 +23,11 @@ public class Ordinary implements Serializable {
 				level = max.level;
 				id = max.id;
 				
-				Node RMIreceiver = (Node) java.rmi.Naming.lookup(Config.localNodes[id]);
+				Node RMIreceiver = (Node) java.rmi.Naming.lookup(Config.nodes[id]);
 				RMIreceiver.sendAck(id);
 				//Maestro.nodes.get(id).sendAck(id);
 				
-	            System.out.println("Sent ACK to " + Config.localNodes[id] + " (" + id + ")");
+	            System.out.println("Sent ACK to " + Config.nodes[id] + " (" + id + ")");
 			}
 		}
 	}

@@ -40,7 +40,7 @@ public class Main
     			System.out.println("* node " + i);
     			nodes.add(n);
     			try {
-					java.rmi.Naming.bind(Config.localNodes[i], n);
+					java.rmi.Naming.bind(Config.nodes[i], n);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
