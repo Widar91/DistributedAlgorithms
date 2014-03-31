@@ -1,10 +1,11 @@
 package nl.tudelft.doitlive;
 
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NodeImpl implements Node {
+public class NodeImpl extends UnicastRemoteObject implements Node {
 	private static final long serialVersionUID = -7172794904772647591L;
 	
 	private int id;
@@ -15,14 +16,14 @@ public class NodeImpl implements Node {
 	private Candidate candidate;
 	private Ordinary ordinary;
 	
-	public NodeImpl(int id) {
+	public NodeImpl(int id) throws Throwable {
 		this.id = id;
 
 		messages = new ArrayList<>();
 		acks = new ArrayList<>();
 
 		List<Integer> E = new ArrayList<>();
-		for (int n = 0; n < Config.numNodes; n++)
+		for (int n = 0; n < Config.numLocalNodes; n++)
 			if(n != id)
 				E.add(n);
 
@@ -34,8 +35,8 @@ public class NodeImpl implements Node {
 	@Override
 	public synchronized void sendMessage(Message m) throws RemoteException {
 		messages.add(m);
-		System.out.println(id + " >> [NodeImpl]  sendMessage: " + m);
-		System.out.println(id + " >> [NodeImpl]  msg list:   " + messages + "["+ messages.hashCode() +"]");
+		//System.out.println(id + " >> [NodeImpl]  sendMessage: " + m);
+		//System.out.println(id + " >> [NodeImpl]  msg list:   " + messages + "["+ messages.hashCode() +"]");
 	}
 
 	@Override
@@ -46,9 +47,9 @@ public class NodeImpl implements Node {
 	@Override
 	public synchronized boolean pulseOrdinary() throws RemoteException {
 		try {
-			System.out.println(id + " >> [pulseOrd]  messages: " + messages);
+			//System.out.println(id + " >> [pulseOrd]  messages: " + messages);
 			ordinary.run(messages);
-			System.out.println(id + " >> [pulseOrd] finished - clearing msg list " + messages);
+			//System.out.println(id + " >> [pulseOrd] finished - clearing msg list " + messages);
 			messages.clear();
 		} catch (Throwable t) {
 			t.printStackTrace();
@@ -61,7 +62,7 @@ public class NodeImpl implements Node {
 		try {
 			if (candidate.canLee() && candidate.run(acks))
 				return true;
-			System.out.println(id + " >> [pulseCand] finished - clearing ack list: " + acks);
+			//System.out.println(id + " >> [pulseCand] finished - clearing ack list: " + acks);
 			acks.clear();
 		} catch (Throwable t) {
 			t.printStackTrace();

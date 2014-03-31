@@ -24,22 +24,22 @@ public class Candidate implements Serializable {
 		K = Math.min((int)Math.pow(2, level/2), Math.abs(E.size()));
 		if (level % 2 == 0) {
 			if (E.isEmpty()) {
-				System.out.println("I HAVE BEEN ELECTED!!");
+				System.out.println(id + " >> I HAVE BEEN ELECTED!!");
 				return true;
 			} else {
 				for (int i = 0; i < K; i++) {
 					Integer n = E.get(0);
-					System.out.println("\n" + id + " >> [Candidate] sending msg to " + Config.nodes[n]);
+					System.out.println(id + " >> [Candidate] sending msg to " + Config.localNodes[n]);
 					
-					//Node RMIreceiver = (Node) java.rmi.Naming.lookup(Config.nodes[n]);
-					//RMIreceiver.sendMessage(new Message(level, id));
-					Maestro.nodes.get(n).sendMessage(new Message(level, id));
+					Node RMIreceiver = (Node) java.rmi.Naming.lookup(Config.localNodes[n]);
+					RMIreceiver.sendMessage(new Message(level, id));
+					//Maestro.nodes.get(n).sendMessage(new Message(level, id));
 					
 					E.remove(0);
 				}
 			}
 		} else if (acks.size() < K) {
-				System.out.println("I CAN LEE ANYMOOOO'");
+				System.out.println(id + " >> I CAN LEE ANYMOOOO'");
 				canLee = false;
 		}
 		return false;

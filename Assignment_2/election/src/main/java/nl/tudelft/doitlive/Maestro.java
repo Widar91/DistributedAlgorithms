@@ -28,40 +28,43 @@ public class Maestro {
 		
 		
 		// create registry, no need to do it from the commnad line
-    	java.rmi.registry.LocateRegistry.createRegistry(1099);  
+    	//java.rmi.registry.LocateRegistry.createRegistry(1099);  
     	
     	
     	// create nodes and bind them
-    	for (int i = 0; i < Config.numNodes; i++) {
-    			
-    			NodeImpl n = new NodeImpl(i);
-    			System.out.println("* node " + i);
-    			nodes.add(n);
-    			try {
-					java.rmi.Naming.bind(Config.nodes[i], n);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-    			
-    	}
+//    	for (int i = 0; i < Config.numLocalNodes; i++) {
+//    			
+//    			NodeImpl n = new NodeImpl(i);
+//    			System.out.println("* node " + i);
+//    			nodes.add(n);
+//    			try {
+//					java.rmi.Naming.bind(Config.localNodes[i], n);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//				}
+//    			
+//    	}
 		
-//    	java.rmi.registry.LocateRegistry.getRegistry(1099);
-//		List<Node> nodes = new ArrayList<Node>();
-//		for (String node : Config.nodes) {
-//			nodes.add((Node) java.rmi.Naming.lookup(node));
-//		}
+    	java.rmi.registry.LocateRegistry.getRegistry(1099);
+		List<Node> nodes = new ArrayList<Node>();
+		for (String node : Config.localNodes) {
+			nodes.add((Node) java.rmi.Naming.lookup(node));
+		}
+		for (String node : Config.remoteNodes) {
+			nodes.add((Node) java.rmi.Naming.lookup(node));
+		}
 
     	// turns
 		while (true) {
-			System.out.println("\n*** NEW ROUND ***");
+			System.out.println("\n===================== NEW ROUND =====================");
 			System.out.println("*** CANDIDATE ***");
-			for (NodeImpl n : nodes) {
+			for (Node n : nodes) {
 				Thread.sleep(1000);
 				if (n.pulseCandidate())
 					return;
 			}
 			System.out.println("\n*** ORDINARY ***");
-			for (NodeImpl n : nodes) {
+			for (Node n : nodes) {
 				Thread.sleep(1000);
 				n.pulseOrdinary();
 			}

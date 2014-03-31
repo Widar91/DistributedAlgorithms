@@ -1,8 +1,11 @@
 package nl.tudelft.doitlive;
 
+import java.rmi.RemoteException;
 import java.security.Permission;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.naming.InitialContext;
 
 public class Main 
 {
@@ -19,23 +22,31 @@ public class Main
         	    public void checkPropertyAccess (String key) {}
         	});
     	
-    	// create registry
-    	java.rmi.registry.LocateRegistry.createRegistry(1099);  
+        // Registry creation
+    	//java.rmi.registry.LocateRegistry.createRegistry(1099);  
+        try {
+        	java.rmi.registry.LocateRegistry.getRegistry(1099); 
+        	System.out.println("Registry created");
+        } catch (RemoteException e) {
+        	java.rmi.registry.LocateRegistry.createRegistry(1099);
+        	System.out.println("Registry located");
+        }
     	
     	List<Node> nodes = new ArrayList<>();
+    	for (int i = 0; i < Config.numLocalNodes; i++) {
     	
-    	for (int i = 0; i < Config.numNodes; i++) {
     			
     			Node n = new NodeImpl(i);
     			System.out.println("* node " + i);
     			nodes.add(n);
     			try {
-					java.rmi.Naming.bind(Config.nodes[i], n);
+					java.rmi.Naming.bind(Config.localNodes[i], n);
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
     			
     	}
+    	
     	
     	while (true) {}
     	
