@@ -23,14 +23,14 @@ public class Main
         	});
     	
         // Registry creation
-    	//java.rmi.registry.LocateRegistry.createRegistry(1099);  
-        try {
-        	java.rmi.registry.LocateRegistry.getRegistry(1099); 
-        	System.out.println("Registry created");
-        } catch (RemoteException e) {
-        	java.rmi.registry.LocateRegistry.createRegistry(1099);
-        	System.out.println("Registry located");
-        }
+    	java.rmi.registry.LocateRegistry.createRegistry(1099);  
+//        try {
+//        	java.rmi.registry.LocateRegistry.getRegistry(1099); 
+//        	System.out.println("Registry created");
+//        } catch (RemoteException e) {
+//        	java.rmi.registry.LocateRegistry.createRegistry(1099);
+//        	System.out.println("Registry located");
+//        }
     	
     	List<Node> nodes = new ArrayList<>();
     	for (int i = 0; i < Config.numLocalNodes; i++) {

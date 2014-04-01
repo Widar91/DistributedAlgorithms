@@ -51,19 +51,25 @@ public class Maestro {
 			nodes.add((Node) java.rmi.Naming.lookup(node));
 		}
 		
+		int round = -1;
+		Node late = nodes.get(5);
+		nodes.remove(5);
 
     	// turns
 		while (true) {
+			round++;
+			if (round == 2)
+				nodes.add(late);
 			System.out.println("\n===================== NEW ROUND =====================");
 			System.out.println("*** CANDIDATE ***");
 			for (Node n : nodes) {
-				Thread.sleep(1000);
+				Thread.sleep(200);
 				if (n.pulseCandidate())
 					return;
 			}
 			System.out.println("\n*** ORDINARY ***");
 			for (Node n : nodes) {
-				Thread.sleep(1000);
+				Thread.sleep(200);
 				n.pulseOrdinary();
 			}
 		}
