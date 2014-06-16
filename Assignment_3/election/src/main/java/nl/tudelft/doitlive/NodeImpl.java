@@ -254,11 +254,7 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
 		}
 		
 		for (String receiverURL : Config.nodes) {
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
+			
 			
 			//String[] parts = receiverURL.split("/");
 			//int receiverId = Integer.parseInt(parts[parts.length-1]); 
