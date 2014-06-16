@@ -67,7 +67,7 @@ public class Maestro {
 			for (Node n : nodes) {
 				Thread thread = new Thread(() -> {
 					try {
-						Thread.sleep(200);
+						//Thread.sleep(200);
 						boolean decision = n.pulse(r);
 						
 						if (decision) {

@@ -3,7 +3,6 @@ package nl.tudelft.doitlive;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -19,33 +18,60 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
 	private int value;
 	private boolean decided = false;
 	private Random random; 
-	private List<Message> messages;
+	private List<Message> ms1;
+	private List<Message> ms2;
+	private List<Message> ms3;
+	private boolean isBetrayer;
 
-	public NodeImpl(int id) throws Throwable {
+	public NodeImpl(int id, boolean isBetrayer) throws Throwable {
 		this.id = id;
 		this.random = new Random();
 		this.value = random.nextInt(2);
-		this.messages = new ArrayList<>();
+		this.ms1 = new ArrayList<>();
+		this.ms2 = new ArrayList<>();
+		this.ms3 = new ArrayList<>();
+		this.isBetrayer = isBetrayer;
 		System.out.println("Instantiating node, id: " + id + " value: " + value);
 	}
 
 	@Override
 	public boolean pulse(int r) throws RemoteException {
 		
-		System.out.println("NOTIFICATION PHASE");
+		this.ms1 = new ArrayList<>();
+		this.ms2 = new ArrayList<>();
+		this.ms3 = new ArrayList<>();
+		
+		System.out.println("----- NOTIFICATION -----");
 		broadcastMessage(new Message(Message.N, r, value));
-		System.out.println("NOTIFICATION PHASE ENDED");
 		
-		while(messages.size() < Config.nodes.length - Config.faultyNodes) {/*System.out.println("[id] " + id + " [messages size] " + messages.size());*/}
+		while(ms1.size() < Config.nodes.length - Config.faultyNodes) {/*System.out.println("[id] " + id + " [messages size] " + messages.size());*/}
 		
-		System.out.println(id + "> [messages] " + messages);
-		int num0 = (int) messages.stream().filter(m -> m.value == 0).count();
-		int num1 = (int) messages.stream().filter(m -> m.value == 1).count();
+		List<Message> ms = new ArrayList<>();
+		synchronized(ms1) {
+			for(Message m : ms1) {
+				ms.add(m);
+			}
+		}
+		
+		System.out.println(id + "> [messages] " + ms);
+//		int num0 = (int) messages.stream().filter(m -> m.value == 0).count();
+//		int num1 = (int) messages.stream().filter(m -> m.value == 1).count();
+		
+		int num0 = 0;
+		int num1 = 0;
+		for(Message m : ms) {
+			if (m.value == 0) {
+				num0++;
+			} else if (m.value == 1) {
+				num1++;
+			}
+		}
+		
 		int c = Math.max(num0, num1);
 		int w = c == num0 ? 0 : 1;
-		messages = new ArrayList<>();
 		
-		if(c > (Config.nodes.length + Config.faultyNodes)/2) {
+		System.out.println("----- PROPOSAL -----");
+		if(c > (Config.nodes.length + Config.faultyNodes )/2) {
 			broadcastMessage(new Message(Message.P, r, w));
 		} else {
 			broadcastMessage(new Message(Message.P, r, -13));
@@ -54,13 +80,32 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
 		if(decided)
 			return true;
 		
-		while(messages.size() < Config.nodes.length - Config.faultyNodes) {}
+		while(ms2.size() < Config.nodes.length - Config.faultyNodes) {System.out.println("[id] " + id + " [messages size] " + ms2.size());}
 		
-		num0 = (int) messages.stream().filter(m -> m.value == 0).count();
-		num1 = (int) messages.stream().filter(m -> m.value == 1).count();
+		List<Message> msp = new ArrayList<>();
+		synchronized(ms2) {
+			for(Message m : ms2) {
+				msp.add(m);
+			}
+		}
+		
+//		num0 = (int) messages.stream().filter(m -> m.value == 0).count();
+//		num1 = (int) messages.stream().filter(m -> m.value == 1).count();
+		
+		num0 = 0;
+		num1 = 0;
+		for(Message m : msp) {
+			if (m.value == 0) {
+				num0++;
+			} else if (m.value == 1) {
+				num1++;
+			}
+		}
+		
 		c = Math.max(num0, num1);
 		w = c == num0 ? 0 : 1;
-		messages = new ArrayList<>();
+
+		System.out.println("----- DECISION -----");
 		
 		if(c > Config.faultyNodes) {
 			value = w;
@@ -79,7 +124,12 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
 	
 	@Override
 	public synchronized boolean sendMessage(Message m) throws RemoteException {
-		messages.add(m);
+		if(m.type == Message.N) {
+			ms1.add(m);
+		}
+		else if (m.type == Message.P) {
+			ms2.add(m);
+		}
 		System.out.println("message: " + m);
 		return m != null;
 	}
@@ -97,6 +147,11 @@ public class NodeImpl extends UnicastRemoteObject implements Node {
 	private void broadcastMessage(Message msg) {
 
 		int numSent = 0;
+		if (isBetrayer) {
+			System.out.println("I AM A BETRAYERRRR: " + id);
+			msg.value = 0;
+			//return;
+		}
 		
 		for (String receiverURL : Config.nodes) {
 			//String[] parts = receiverURL.split("/");
