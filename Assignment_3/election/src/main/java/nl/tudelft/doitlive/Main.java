@@ -35,7 +35,7 @@ public class Main
     	List<Node> nodes = new ArrayList<>();
     	for (int i = 0; i < Config.numLocalNodes; i++) {
     			
-    			Node n = new NodeImpl(i, i == 3);
+    			Node n = new NodeImpl(i, i == 3 || i == 4);
     			System.out.println("* node " + i);
     			nodes.add(n);
     			try {

@@ -13,6 +13,8 @@ import java.util.List;
 public class Maestro {
 
 	public static List<NodeImpl> nodes = new ArrayList<>();
+	
+	public static Integer numDone = 0;
 
 	public static void main(String[] args) throws Throwable {
 		
@@ -66,11 +68,21 @@ public class Maestro {
 			
 			for (Node n : nodes) {
 				Thread thread = new Thread(() -> {
-					try {
-						//Thread.sleep(200);
-						boolean decision = n.pulse(r);
+					try {						
 						
-						if (decision) {
+						n.pulse1(r);
+						
+						//System.out.println("PHASE 1 DONE");
+						
+						n.pulse2(r);
+						
+						//System.out.println("PHASE 2 DONE");
+							
+						n.pulse3(r);
+						
+						//System.out.println("PHASE 3 DONE");
+						
+						if (n.getDecision() != -13) {
 							System.out.println("[id: " + n.getId() + "] I have decided for " + n.getDecision());
 							ds[n.getId()] = true;
 							//return;
